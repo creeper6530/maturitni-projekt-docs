@@ -190,32 +190,61 @@ fn main() {
 }
 ```
 
-# References
+# Initialisation
 
-Fails to compile:
+Compiles:
 
 ```rust
-fn main() {               // ---------+-- A
-    let ref_x;            //          |
-                          //          |
-    {                     // -+-- B   |
-        ref_x = &x;       //  |       |
-        let x = 5;        //  |       |
-    }                     // -+       |
-                          //          |
-    println!("r: {ref_x}"); //        |
-}                         // ---------+
+fn main() {
+    let a;
+    let b: bool;
+    let mut c: u8;
+
+    a = 20;
+    b = false;
+    c = 15;
+
+    c = c * 2;
+
+    println!("a: {a}");
+    println!("b: {b}");
+    println!("c: {c}");
+}
 ```
 
 ```
-error[E0425]: cannot find value `x` in this scope
- --> .\test_code.rs:5:18
+a: 20
+b: false
+c: 30
+```
+
+<br>Fails to compile:
+
+```rust
+fn main() {
+    let a;
+    println!("a: {a}");
+
+    a = 20;
+    println!("a: {a}");
+}
+```
+
+```
+error[E0381]: used binding `a` is possibly-uninitialized
+ --> .\test_code.rs:3:19
   |
-5 |         ref_x = &x;       //  |       |
-  |                  ^ not found in this scope
+2 |     let a;
+  |         - binding declared here but left uninitialized
+3 |     println!("a: {a}");
+  |                   ^ `a` used here but it is possibly-uninitialized
+  |
+  = note: this error originates in the macro `$crate::format_args_nl` which comes from the expansion of the macro `println` (in Nightly builds, run with -Z macro-backtrace for more info)
 ```
 
-<hr>Fails to compile:
+# Basics of references
+
+Fails to compile:
 
 ```rust
 fn main() {               // ---------+-- A
@@ -239,61 +268,66 @@ error[E0597]: `x` does not live long enough
 6 |         ref_x = &x;       //  |       |
   |                 ^^ borrowed value does not live long enough
 7 |     }                     // -+       |
+  |     - `x` dropped here while still borrowed
 8 |                           //          |
 9 |     println!("r: {ref_x}"); //        |
   |                   ----- borrow later used here
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0597`.
 ```
 
 <hr>Fails to compile:
 
 ```rust
-fn main() {               // ---------+-- A
-    let ref_x;            //          |
-    let x;                //          |
-                          //          |
-    {                     // -+-- B   |
-        ref_x = &x;       //  |       |
-        x = 5;            //  |       |
-    }                     // -+       |
-                          //          |
-    println!("r: {ref_x}"); //        |
-}                         // ---------+
+fn main() {
+    let mut x = 5;
+    let ref_x = &x;
+
+    println!("x: {x}");
+    println!("r: {ref_x}");
+
+    x = 20;
+    println!("x: {x}");
+    println!("r: {ref_x}");
+}
 ```
 
 ```
-error[E0381]: used binding `x` is possibly-uninitialized  
- --> .\test_code.rs:6:17
-  |
-3 |     let x;                //          |
-  |         - binding declared here but left uninitialized
-...
-6 |         ref_x = &x;       //  |       |
-  |                 ^^ `x` used here but it is possibly-uninitialized
-
 error[E0506]: cannot assign to `x` because it is borrowed
-  --> .\test_code.rs:7:9
+  --> .\test_code.rs:8:5
    |
- 6 |         ref_x = &x;       //  |       |
+ 3 |     let ref_x = &x;
    |                 -- `x` is borrowed here
- 7 |         x = 5;            //  |       |
-   |         ^^^^^ `x` is assigned to here but it was already borrowed
 ...
-10 |     println!("r: {ref_x}"); //        |
+ 8 |     x = 20;
+   |     ^^^^^^ `x` is assigned to here but it was already borrowed
+ 9 |     println!("x: {x}");
+10 |     println!("r: {ref_x}");
    |                   ----- borrow later used here
 ```
 
 <hr>Compiles successfully:
 
 ```rust
-fn main() {               // ---------+-- A
-    let ref_x;            //          |
-    let x;                //          |
-                          //          |
-    {                     // -+-- B   |
-        x = 5;            //  |       |
-        ref_x = &x;       //  |       |
-    }                     // -+       |
-                          //          |
-    println!("r: {ref_x}"); //        |
-}                         // ---------+
+fn main() {
+    let mut x = 5;
+    let mut ref_x = &x;
+
+    println!("x: {x}");
+    println!("r: {ref_x}");
+
+    x = 20;
+    ref_x = &x;
+    println!("x: {x}");
+    println!("r: {ref_x}");
+}
+```
+
+```
+x: 5
+r: 5
+x: 20
+r: 20
 ```
