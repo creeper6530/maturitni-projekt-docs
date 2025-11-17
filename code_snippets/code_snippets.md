@@ -1,4 +1,4 @@
-# Scopes and mutability
+# Scopes, shadowing and mutability
 
 Fails to compile:
 
@@ -7,8 +7,8 @@ fn main() {               // ---------+-- A
     let x = 20;           //          |
                           //          |
     {                     // -+-- B   |
-        println!("x: {x}");//         |
         let y = 5;        //  |       |
+        println!("x: {x}");// |       |
     }                     // -+       |
                           //          |
     println!("y: {y}");   //          |
@@ -23,6 +23,26 @@ error[E0425]: cannot find value `y` in this scope
   |                   ^ help: a local variable with a similar name exists: `x`
 
 error: aborting due to 1 previous error
+```
+
+<hr>Compiles successfully.
+
+```rust
+fn main() {               // ---------+-- A
+    let x = 20;           //          |
+                          //          |
+    {                     // -+-- B   |
+        let y = 5;        //  |       |
+        println!("y: {y}");// |       |
+    }                     // -+       |
+                          //          |
+    println!("x: {x}");   //          |
+}                         // ---------+
+```
+
+```
+y: 5
+x: 20
 ```
 
 <hr>Compiles with warning, acts unexpectedly.
@@ -139,6 +159,34 @@ fn main() {
     let d = true;
     let e = 20;
     let f = 2.7;
+}
+```
+
+These fail to compile because of overflowing literal
+
+```rust
+fn main() {
+    let a = -2147483649;
+}
+```
+
+```rust
+fn main() {
+    let a: u8 = 1000;
+}
+```
+
+These compile successfully
+
+```rust
+fn main() {
+    let a: i64 = -2147483649;
+}
+```
+
+```rust
+fn main() {
+    let a = -2147483649_i64;
 }
 ```
 
