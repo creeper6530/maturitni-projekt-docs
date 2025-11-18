@@ -350,57 +350,102 @@ For more information about this error, try `rustc --explain E0597`.
 
 ### TODO: Some better example of exclusion of & and &mut at the same time.
 
+<hr>Fails to compile:
+
+```rust
+struct Structure{
+    ptr: &u32
+}
+
+fn main() {}
+```
+
+```
+error[E0106]: missing lifetime specifier
+ --> .\test_code.rs:2:10
+  |
+2 |     ptr: &u32
+  |          ^ expected named lifetime parameter
+  |
+help: consider introducing a named lifetime parameter
+  |
+1 ~ struct Structure<'a>{
+2 ~     ptr: &'a u32
+  |
+```
 
 <hr>Fails to compile:
 
 ```rust
+struct PtrCapsule<'a>{
+    ptr: &'a u32
+}
+
+impl<'a> PtrCapsule<'a>{
+    fn print(&self){
+        println!("Value: {}", self.ptr);
+    }
+}
+
+fn inc(num: &mut u32){
+    *num += 1
+}
+
 fn main() {
-    let mut x = 5;
-    let ref_x = &x;
+    let mut x = 20;
+    let capsule = PtrCapsule{ ptr: &x };
 
-    println!("x: {x}");
-    println!("r: {ref_x}");
+    println!("x: {}", x);
 
-    x = 20;
-    println!("x: {x}");
-    println!("r: {ref_x}");
+    inc(&mut x);
+    capsule.print();
 }
 ```
 
 ```
-error[E0506]: cannot assign to `x` because it is borrowed
-  --> .\test_code.rs:8:5
+error[E0502]: cannot borrow `x` as mutable because it is also borrowed as immutable
+  --> .\test_code.rs:21:9
    |
- 3 |     let ref_x = &x;
-   |                 -- `x` is borrowed here
+17 |     let capsule = PtrCapsule{ ptr: &x };
+   |                                    -- immutable borrow occurs here
 ...
- 8 |     x = 20;
-   |     ^^^^^^ `x` is assigned to here but it was already borrowed
- 9 |     println!("x: {x}");
-10 |     println!("r: {ref_x}");
-   |                   ----- borrow later used here
+21 |     inc(&mut x);
+   |         ^^^^^^ mutable borrow occurs here
+22 |     capsule.print();
+   |     ------- immutable borrow later used here
 ```
 
 <hr>Compiles successfully:
 
 ```rust
+use std::cell::RefCell;
+
+struct RefCapsule<'a>{
+    cell: &'a RefCell<u32>
+}
+
+impl<'a> RefCapsule<'a>{
+    fn print(&self){
+        println!("Value: {}", self.cell.borrow());
+    }
+}
+
+fn inc(num: &RefCell<u32>){
+    *num.borrow_mut() += 1
+}
+
 fn main() {
-    let mut x = 5;
-    let mut ref_x = &x;
+    let x = RefCell::new(20);
+    let capsule = RefCapsule{ cell: &x };
 
-    println!("x: {x}");
-    println!("r: {ref_x}");
+    println!("x: {}", x.borrow());
 
-    x = 20;
-    ref_x = &x;
-    println!("x: {x}");
-    println!("r: {ref_x}");
+    inc(&x);
+    capsule.print();
 }
 ```
 
 ```
-x: 5
-r: 5
 x: 20
-r: 20
+Value: 21
 ```
