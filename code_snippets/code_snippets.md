@@ -247,6 +247,76 @@ error[E0381]: used binding `a` is possibly-uninitialized
 Fails to compile:
 
 ```rust
+fn len_by_value(param: String) -> usize { // ---+-- B
+    param.len() //                              |
+} // -------------------------------------------+
+
+fn main() { // --------------------------+-- A
+    let x = String::from("123"); //      |
+//                                       |
+    let lenght = len_by_value(x); //     |
+    println!("x' lenght: {}", lenght); //|
+    println!("x: {}", x); //             |
+} // ------------------------------------+
+```
+
+```
+error[E0382]: borrow of moved value: `x`
+  --> .\test_code.rs:10:23
+   |
+ 6 |     let x = String::from("123"); //      |
+   |         - move occurs because `x` has type `String`, which does not implement the `Copy` trait
+ 7 | //                                       |
+ 8 |     let lenght = len_by_value(x); //     |
+   |                               - value moved here
+ 9 |     println!("x' lenght: {}", lenght); //|
+10 |     println!("x: {}", x); //             |
+   |                       ^ value borrowed here after move
+   |
+note: consider changing this parameter type in function `len_by_value` to borrow instead if owning the value isn't necessary
+  --> .\test_code.rs:1:24
+   |
+ 1 | fn len_by_value(param: String) -> usize { // ---+-- B
+   |    ------------        ^^^^^^ this parameter takes ownership of the value
+   |    |
+   |    in this function
+   = note: this error originates in the macro `$crate::format_args_nl` which comes from the expansion of the macro `println` (in Nightly builds, run with -Z macro-backtrace for more info)
+help: consider cloning the value if the performance cost is acceptable
+   |
+ 8 |     let lenght = len_by_value(x.clone()); //     |
+   |                                ++++++++
+```
+
+<hr>Compiles successfully:
+
+```rust
+fn len_by_ref(param: &String) -> usize { // --+-- B
+    param.len() //                            |
+} // -----------------------------------------+
+
+fn mod_by_ref(param: &mut String) { //---+-- C
+    param.push('4'); //                  |
+} // ------------------------------------+
+
+fn main() { //---------------------------+-- A
+    let mut x = String::from("123"); //  |
+//                                       |
+    mod_by_ref(&mut x); //               |
+//                                       |
+    let lenght = len_by_ref(&x); //      |
+    println!("x' lenght: {}", lenght); //|
+    println!("x: {}", x); //             |
+} // ------------------------------------+
+```
+
+```
+x' lenght: 4
+x: 1234
+```
+
+<hr>Fails to compile:
+
+```rust
 fn main() {               // ---------+-- A
     let ref_x;            //          |
                           //          |
@@ -277,6 +347,9 @@ error: aborting due to 1 previous error
 
 For more information about this error, try `rustc --explain E0597`.
 ```
+
+### TODO: Some better example of exclusion of & and &mut at the same time.
+
 
 <hr>Fails to compile:
 
