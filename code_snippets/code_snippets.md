@@ -450,6 +450,148 @@ x: 20
 Value: 21
 ```
 
+# Variable types
+
+Compiles successfully:
+
+```rust
+#![allow(unused)]
+fn main() {
+    let a: char = 'a';
+    let b: char = '💜';
+    let c: bool = true;
+    let d: &str = "Hello";
+    let e: [u8; 5] = [1, 2, 3, 4, 5];
+    let mut f: [bool; 3] = [true, true, true];
+    f[1] = false;
+    let g: (u16, i64) = (20, -50_000);
+    let mut h: (f64, &str, bool) = (
+        3.1415926535,
+        "Pi",
+        true
+    );
+    h.0 = 3.0;
+    
+    let mut i: [[u8; 5]; 5] = [
+        [00, 00, 11, 00, 00],
+        [00, 11, 11, 11, 00],
+        [11, 00, 11, 00, 11],
+        [00, 00, 11, 00, 00],
+        [00, 00, 11, 00, 00],
+    ];
+    i[1][3] = 22;
+}
+```
+
+# Structs and enums
+
+Compiles successfully:
+
+```rust
+#![allow(unused)]
+enum Smer {
+    Vpred,
+    Vzad,
+    Vlevo,
+    Vpravo
+}
+
+fn main() {
+    let forwards = Smer::Vpred;
+    let left = Smer::Vlevo;
+}
+```
+
+<hr>Compiles successfully:
+
+```rust
+#![allow(unused)]
+enum Smer {
+    Vpred,
+    Vzad,
+    Vlevo,
+    Vpravo
+}
+
+enum Akce {
+    NedelejNic,
+    OtevriInventar,
+    Rekni(String),
+    JdiNaSouradnice(i32, i32),
+    PodivejSeNa { predmet: String, smer: Smer }
+}
+
+fn main() {
+    let akce1 = Akce::Rekni(String::from("Ahoj!"));
+    let akce2 = Akce::JdiNaSouradnice(20, 45);
+    let akce3 = Akce::PodivejSeNa {
+        predmet: String::from("Meč sv. Jiří"),
+        smer: Smer::Vlevo
+    };
+    let akce4 = Akce::OtevriInventar;
+}
+```
+
+# Error handling
+
+Compiles successfully, panics:
+
+```rust
+#![allow(unused)]
+use std::fs::File;
+
+fn main() {
+    let greeting_file_1 = File::open("hello1.txt").unwrap();
+    let greeting_file_2 = File::open("hello2.txt")
+        .expect("hello.txt should be included in this project");
+}
+```
+
+<hr>Compiles successfully:
+
+```rust
+#![allow(unused)]
+use std::fs::File;
+
+fn main() {
+    let file_result: Result<_, _> = File::open("hello.txt");
+
+    let file = match file_result {
+        Ok(mut file) => { // Unnecessary mut
+            println!("File found, opening.");
+            file
+        },
+        Err(error) => match error.kind() {
+            ErrorKind::NotFound => {
+                println!("File not found, creating file.");
+                File::create("hello.txt")
+                    .expect("Failed to create file")
+            }
+            _ => panic!("Problem opening the file: {error:?}")
+        },
+    };
+}
+```
+
+<hr>Compiles successfully:
+
+```rust
+#![allow(unused)]
+
+fn main() {
+    let num: Option<u8> = None;
+    let message = Some("Hello!");
+    maybe_say(message);
+}
+
+fn maybe_say(input: Option<&str>) {
+    match input {
+        None => return,
+        Some(msg) => println!("{}", msg)
+    }
+}
+```
+
 # Generics and traits
 
 Fails to compile:
@@ -461,8 +603,7 @@ fn largest<T>(list: &[T]) -> &T {
     for item in list {
         if item > largest {
             largest = item;
-        }
-    }
+    }}
 
     largest
 }
@@ -498,7 +639,9 @@ For more information about this error, try `rustc --explain E0369`.
 <hr>Compiles successfully:
 
 ```rust
-fn largest<T>(list: &[T]) -> &T {
+fn largest<T: std::cmp::PartialOrd>(list: &[T]) -> Option<&T> {
+    if list.len() == 0 { return None };
+
     let mut largest = &list[0];
 
     for item in list {
@@ -507,14 +650,17 @@ fn largest<T>(list: &[T]) -> &T {
         }
     }
 
-    largest
+    Some(largest)
 }
 
 fn main() {
     let result_num = largest(&[1, 0, 15, -20, 89]);
-    println!("The largest number is {result_num}");
+    println!("The largest number is {result_num:?}");
 
     let result_char = largest(&['a', 'Z', 'g', 'P']);
-    println!("The largest char is {result_char}");
+    println!("The largest char is {result_char:?}");
+
+    let result_num = largest::<f64>(&[]);
+    println!("The largest float is {result_num:?}");
 }
 ```
