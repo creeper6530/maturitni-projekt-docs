@@ -449,3 +449,72 @@ fn main() {
 x: 20
 Value: 21
 ```
+
+# Generics and traits
+
+Fails to compile:
+
+```rust
+fn largest<T>(list: &[T]) -> &T {
+    let mut largest = &list[0];
+
+    for item in list {
+        if item > largest {
+            largest = item;
+        }
+    }
+
+    largest
+}
+
+fn main() {
+    let result_num = largest(&[1, 0, 15, -20, 89]);
+    println!("The largest number is {result_num}");
+
+    let result_char = largest(&['a', 'Z', 'g', 'P']);
+    println!("The largest char is {result_char}");
+}
+```
+
+```
+error[E0369]: binary operation `>` cannot be applied to type `&T`
+ --> test.rs:5:17
+  |
+5 |         if item > largest {
+  |            ---- ^ ------- &T
+  |            |
+  |            &T
+  |
+help: consider restricting type parameter `T` with trait `PartialOrd`
+  |
+1 | fn largest<T: std::cmp::PartialOrd>(list: &[T]) -> &T {
+  |             ++++++++++++++++++++++
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0369`.
+```
+
+<hr>Compiles successfully:
+
+```rust
+fn largest<T>(list: &[T]) -> &T {
+    let mut largest = &list[0];
+
+    for item in list {
+        if item > largest {
+            largest = item;
+        }
+    }
+
+    largest
+}
+
+fn main() {
+    let result_num = largest(&[1, 0, 15, -20, 89]);
+    println!("The largest number is {result_num}");
+
+    let result_char = largest(&['a', 'Z', 'g', 'P']);
+    println!("The largest char is {result_char}");
+}
+```
