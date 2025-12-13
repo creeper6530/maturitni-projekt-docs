@@ -664,3 +664,85 @@ fn main() {
     println!("The largest float is {result_num:?}");
 }
 ```
+
+<hr>Compiles successfully:
+
+```rust
+#[derive(Clone, Copy, Debug)]
+struct Copiable {}
+
+fn main() {
+    let x = Copiable{};
+    let y = x
+
+    println!("{:?}", x);
+    println!("{:?}", y);
+}
+```
+
+<hr>Compiles successfully:
+
+```rust
+#![allow(unused)]
+
+trait Summary {
+    fn summarize_author(&self) -> String;
+
+    fn summarize(&self) -> String {
+        format!("(Read more from {}...)", self.summarize_author())
+    }
+}
+
+struct NewsArticle {
+    headline: String,
+    location: String,
+    author: String,
+    content: String,
+}
+
+impl Summary for NewsArticle {
+    fn summarize(&self) -> String {
+        format!("{}, by {} ({})", self.headline, self.author, self.location)
+    }
+
+    fn summarize_author(&self) -> String {
+        format!("By {}", self.author)
+    }
+}
+
+struct SocialPost {
+    username: String,
+    content: String,
+    reply: bool,
+    repost: bool,
+}
+
+impl Summary for SocialPost {
+    fn summarize_author(&self) -> String {
+        format!("@{}", self.username)
+    }
+}
+
+fn main() {
+    let article = NewsArticle {
+        headline: String::from("Penguins win the Stanley Cup Championship!"),
+        location: String::from("Pittsburgh, PA, USA"),
+        author: String::from("John Doe"),
+        content: String::from("The Pittsburgh Penguins once again are the best hockey team."),
+    };
+    println!("{}", article.summarize());
+    let post = SocialPost {
+        username: String::from("horse_ebooks"),
+        content: String::from("The best way to learn Rust is to write Rust."),
+        reply: false,
+        repost: false,
+    };
+    println!("{}", post.summarize());
+}
+```
+
+```
+Penguins win the Stanley Cup Championship!, by John Doe (Pittsburgh, PA, USA)
+(Read more from @horse_ebooks...)
+```
+
