@@ -643,7 +643,6 @@ fn largest<T: std::cmp::PartialOrd>(list: &[T]) -> Option<&T> {
     if list.len() == 0 { return None };
 
     let mut largest = &list[0];
-
     for item in list {
         if item > largest {
             largest = item;
@@ -654,14 +653,35 @@ fn largest<T: std::cmp::PartialOrd>(list: &[T]) -> Option<&T> {
 }
 
 fn main() {
-    let result_num = largest(&[1, 0, 15, -20, 89]);
-    println!("The largest number is {result_num:?}");
+    println!("The largest number is {:?}", largest(&[1, 0, 15, -20, 89]));
+    println!("The largest char is {:?}", largest(&['a', 'Z', 'g', 'P']));
 
-    let result_char = largest(&['a', 'Z', 'g', 'P']);
-    println!("The largest char is {result_char:?}");
+    println!("The largest float is {:?}", largest::<f64>(&[]));
+}
+```
 
-    let result_num = largest::<f64>(&[]);
-    println!("The largest float is {result_num:?}");
+<hr>Compiles successfully:
+
+```rust
+#![allow(unused)]
+
+fn main() {}
+
+struct Pair<T> {
+    x: T,
+    y: T,
+}
+
+impl<T> Pair<T> {
+    fn new(x: T, y: T) -> Self {
+        Self { x, y }
+    }
+}
+
+impl<T: PartialOrd> Pair<T> {
+    fn cmp_display(&self) -> bool{
+        if self.x >= self.y { true } else { false }
+    }
 }
 ```
 
@@ -744,5 +764,107 @@ fn main() {
 ```
 Penguins win the Stanley Cup Championship!, by John Doe (Pittsburgh, PA, USA)
 (Read more from @horse_ebooks...)
+```
+
+<hr>Does not compile:
+
+```rust
+#![allow(unused)]
+
+fn main() {}
+
+fn compiles<'a>() -> impl Iterator<Item = &'a u16> {
+    let arr: &[u16] = &[1, 1, 2, 3, 5, 8, 13];
+    arr.iter()
+}
+
+fn compiles_too(maybe: bool) -> impl Iterator {
+    let arr: &[i64];
+    if maybe {
+        arr = &[1, 1, 2, 3, 5, 8, 13];
+    } else {
+        arr = &[42];
+    };
+    arr.iter()
+}
+
+fn not_compiles(maybe: bool) -> impl Iterator {
+    if maybe { "".chars() } else { [].iter() }
+}
+```
+
+```
+error[E0308]: `if` and `else` have incompatible types
+  --> .\test_code.rs:21:36
+   |
+21 |     if maybe { "".chars() } else { [].iter() }
+   |                ----------          ^^^^^^^^^ expected `Chars<'_>`, found `Iter<'_, _>`
+   |                |
+   |                expected because of this
+   |
+   = note: expected struct `Chars<'_>`
+              found struct `std::slice::Iter<'_, _>`
+help: you could change the return type to be a boxed trait object
+   |
+20 - fn not_compiles(maybe: bool) -> impl Iterator {
+20 + fn not_compiles(maybe: bool) -> Box<dyn Iterator> {
+   |
+help: if you change the return type to expect trait objects, box the returned expressions
+   |
+21 |     if maybe { Box::new("".chars()) } else { Box::new([].iter()) }
+   |                +++++++++          +          +++++++++         +
+```
+
+<hr>Compiles successfully:
+
+```rust
+#![allow(unused)]
+
+fn main() {}
+
+fn fixed(maybe: bool) -> Box<dyn Iterator<Item = char>> {
+    if maybe {
+        Box::new("".chars())
+    } else {
+        Box::new(['a'].iter().copied())
+    }
+}
+```
+
+<hr>Compiles successfully:
+
+```rust
+#![allow(unused)]
+#![allow(nonstandard_style)]
+
+#[derive(Debug)]
+enum Freq {
+    Hz(u32),
+    kHz(u32),
+    MHz(u32),
+    GHz(u32)
+}
+
+impl std::fmt::Display for Freq {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Freq::Hz(val) => write!(f, "{} hertz", val),
+            Freq::kHz(val) => write!(f, "{} kilohertz", val),
+            Freq::MHz(val) => write!(f, "{} megahertz", val),
+            Freq::GHz(val) => write!(f, "{} gigahertz", val),
+        }
+    }
+}
+
+fn main() {
+    let freq = Freq::kHz(201);
+    println!("{}", freq);
+    println!("{:?}", freq);
+}
+```
+
+```
+201 kilohertz
+kHz(201)
 ```
 
