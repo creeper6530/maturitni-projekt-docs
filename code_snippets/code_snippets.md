@@ -1,6 +1,6 @@
 # Scopes, shadowing and mutability
 
-Fails to compile:
+Fails to compile (pic 3, error msg: pic 4):
 
 ```rust
 fn main() {               // ---------+-- A
@@ -25,7 +25,7 @@ error[E0425]: cannot find value `y` in this scope
 error: aborting due to 1 previous error
 ```
 
-<hr>Compiles successfully.
+<hr>Compiles successfully (pic 5).
 
 ```rust
 fn main() {               // ---------+-- A
@@ -45,7 +45,7 @@ y: 5
 x: 20
 ```
 
-<hr>Compiles with warning, acts unexpectedly.
+<hr>Compiles with warning, acts unexpectedly (pic 6).
 
 ```rust
 fn main() {               // ---------+-- A
@@ -78,7 +78,7 @@ x: 20
 y: 2048
 ```
 
-<hr>Fails to compile.
+<hr>Fails to compile (pic 7, error msg w/o warning: pic 8).
 
 ```rust
 fn main() {               // ---------+-- A
@@ -126,7 +126,7 @@ x: 20
 y: 2048
 ```
 
-<hr>Compiles successfully.
+<hr>Compiles successfully (pic 9).
 
 ```rust
 fn main() {               // ---------+-- A
@@ -149,7 +149,7 @@ y: 5
 
 # Types and inference
 
-Compiles successfully.
+Compiles successfully (pic 10).
 
 ```rust
 fn main() {
@@ -162,7 +162,7 @@ fn main() {
 }
 ```
 
-These fail to compile because of overflowing literal
+<hr>These fail to compile because of overflowing literal (error msg of latter: pic 11):
 
 ```rust
 fn main() {
@@ -176,7 +176,7 @@ fn main() {
 }
 ```
 
-These compile successfully
+<hr>These compile successfully (latter: pic 12)
 
 ```rust
 fn main() {
@@ -190,9 +190,40 @@ fn main() {
 }
 ```
 
+Compiles successfully (pic 13):
+
+```rust
+#![allow(unused)]
+fn main() {
+    let a: char = 'a';
+    let b: char = '💜';
+    let c: bool = true;
+    let d: &str = "Hello";
+    let e: [u8; 5] = [1, 2, 3, 4, 5];
+    let mut f: [bool; 3] = [true, true, true];
+    f[1] = false;
+    let g: (u16, i64) = (20, -50_000);
+    let mut h: (f64, &str, bool) = (
+        3.1415926535,
+        "Pi",
+        true
+    );
+    h.0 = 3.0;
+    
+    let mut i: [[u8; 5]; 5] = [
+        [00, 00, 11, 00, 00],
+        [00, 11, 11, 11, 00],
+        [11, 00, 11, 00, 11],
+        [00, 00, 11, 00, 00],
+        [00, 00, 11, 00, 00],
+    ];
+    i[1][3] = 22;
+}
+```
+
 # Initialisation
 
-Compiles:
+Compiles (pic 14):
 
 ```rust
 fn main() {
@@ -200,10 +231,11 @@ fn main() {
     let b: bool;
     let mut c: u8;
 
-    a = 20;
-    b = false;
-    c = 15;
-
+    {
+        a = 20;
+        b = false;
+        c = 15;
+    };
     c = c * 2;
 
     println!("a: {a}");
@@ -218,7 +250,7 @@ b: false
 c: 30
 ```
 
-<br>Fails to compile:
+<br>Fails to compile (pic 15, error msg: pic 16):
 
 ```rust
 fn main() {
@@ -244,7 +276,7 @@ error[E0381]: used binding `a` is possibly-uninitialized
 
 # Basics of references
 
-Fails to compile:
+Fails to compile (pic 17, error msg: pic 18):
 
 ```rust
 fn len_by_value(param: String) -> usize { // ---+-- B
@@ -287,7 +319,7 @@ help: consider cloning the value if the performance cost is acceptable
    |                                ++++++++
 ```
 
-<hr>Compiles successfully:
+<hr>Compiles successfully (pic 19):
 
 ```rust
 fn len_by_ref(param: &String) -> usize { // --+-- B
@@ -314,7 +346,7 @@ x' lenght: 4
 x: 1234
 ```
 
-<hr>Fails to compile:
+<hr>Fails to compile (pic 20, error msg: pic 21):
 
 ```rust
 fn main() {               // ---------+-- A
@@ -348,9 +380,7 @@ error: aborting due to 1 previous error
 For more information about this error, try `rustc --explain E0597`.
 ```
 
-### TODO: Some better example of exclusion of & and &mut at the same time.
-
-<hr>Fails to compile:
+<hr>Fails to compile (pic 22, error msg: pic 23):
 
 ```rust
 struct Structure{
@@ -374,7 +404,7 @@ help: consider introducing a named lifetime parameter
   |
 ```
 
-<hr>Fails to compile:
+<hr>Fails to compile (pic 24, error msg: pic 25):
 
 ```rust
 struct PtrCapsule<'a>{
@@ -415,7 +445,7 @@ error[E0502]: cannot borrow `x` as mutable because it is also borrowed as immuta
    |     ------- immutable borrow later used here
 ```
 
-<hr>Compiles successfully:
+<hr>Compiles successfully (pic 26):
 
 ```rust
 use std::cell::RefCell;
@@ -450,42 +480,9 @@ x: 20
 Value: 21
 ```
 
-# Variable types
-
-Compiles successfully:
-
-```rust
-#![allow(unused)]
-fn main() {
-    let a: char = 'a';
-    let b: char = '💜';
-    let c: bool = true;
-    let d: &str = "Hello";
-    let e: [u8; 5] = [1, 2, 3, 4, 5];
-    let mut f: [bool; 3] = [true, true, true];
-    f[1] = false;
-    let g: (u16, i64) = (20, -50_000);
-    let mut h: (f64, &str, bool) = (
-        3.1415926535,
-        "Pi",
-        true
-    );
-    h.0 = 3.0;
-    
-    let mut i: [[u8; 5]; 5] = [
-        [00, 00, 11, 00, 00],
-        [00, 11, 11, 11, 00],
-        [11, 00, 11, 00, 11],
-        [00, 00, 11, 00, 00],
-        [00, 00, 11, 00, 00],
-    ];
-    i[1][3] = 22;
-}
-```
-
 # Structs and enums
 
-Compiles successfully:
+Compiles successfully (pic 31):
 
 ```rust
 #![allow(unused)]
@@ -502,7 +499,7 @@ fn main() {
 }
 ```
 
-<hr>Compiles successfully:
+<hr>Compiles successfully (pic 33):
 
 ```rust
 #![allow(unused)]
@@ -534,7 +531,7 @@ fn main() {
 
 # Error handling
 
-Compiles successfully, panics:
+Compiles successfully, panics (pic 36):
 
 ```rust
 #![allow(unused)]
@@ -547,7 +544,7 @@ fn main() {
 }
 ```
 
-<hr>Compiles successfully:
+<hr>Compiles successfully (pic 37):
 
 ```rust
 #![allow(unused)]
@@ -573,7 +570,7 @@ fn main() {
 }
 ```
 
-<hr>Compiles successfully:
+<hr>Compiles successfully (pic 41):
 
 ```rust
 #![allow(unused)]
@@ -594,7 +591,7 @@ fn maybe_say(input: Option<&str>) {
 
 # Generics and traits
 
-Fails to compile:
+Fails to compile (pic 42, error msg: pic 43):
 
 ```rust
 fn largest<T>(list: &[T]) -> &T {
@@ -636,31 +633,7 @@ error: aborting due to 1 previous error
 For more information about this error, try `rustc --explain E0369`.
 ```
 
-<hr>Compiles successfully:
-
-```rust
-fn largest<T: std::cmp::PartialOrd>(list: &[T]) -> Option<&T> {
-    if list.len() == 0 { return None };
-
-    let mut largest = &list[0];
-    for item in list {
-        if item > largest {
-            largest = item;
-        }
-    }
-
-    Some(largest)
-}
-
-fn main() {
-    println!("The largest number is {:?}", largest(&[1, 0, 15, -20, 89]));
-    println!("The largest char is {:?}", largest(&['a', 'Z', 'g', 'P']));
-
-    println!("The largest float is {:?}", largest::<f64>(&[]));
-}
-```
-
-<hr>Compiles successfully:
+<hr>Compiles successfully (pic 45):
 
 ```rust
 #![allow(unused)]
@@ -685,7 +658,31 @@ impl<T: PartialOrd> Pair<T> {
 }
 ```
 
-<hr>Compiles successfully:
+<hr>Compiles successfully (pic 46):
+
+```rust
+fn largest<T: std::cmp::PartialOrd>(list: &[T]) -> Option<&T> {
+    if list.len() == 0 { return None };
+
+    let mut largest = &list[0];
+    for item in list {
+        if item > largest {
+            largest = item;
+        }
+    }
+
+    Some(largest)
+}
+
+fn main() {
+    println!("The largest number is {:?}", largest(&[1, 0, 15, -20, 89]));
+    println!("The largest char is {:?}", largest(&['a', 'Z', 'g', 'P']));
+
+    println!("The largest float is {:?}", largest::<f64>(&[]));
+}
+```
+
+<hr>Compiles successfully (unused):
 
 ```rust
 #[derive(Clone, Copy, Debug)]
@@ -693,14 +690,14 @@ struct Copiable {}
 
 fn main() {
     let x = Copiable{};
-    let y = x
+    let y = x;
 
     println!("{:?}", x);
     println!("{:?}", y);
 }
 ```
 
-<hr>Compiles successfully:
+<hr>Compiles successfully (pic 47):
 
 ```rust
 #![allow(unused)]
@@ -766,7 +763,7 @@ Penguins win the Stanley Cup Championship!, by John Doe (Pittsburgh, PA, USA)
 (Read more from @horse_ebooks...)
 ```
 
-<hr>Does not compile:
+<hr>Does not compile (pic 48):
 
 ```rust
 #![allow(unused)]
@@ -815,7 +812,7 @@ help: if you change the return type to expect trait objects, box the returned ex
    |                +++++++++          +          +++++++++         +
 ```
 
-<hr>Compiles successfully:
+<hr>Compiles successfully (unused):
 
 ```rust
 #![allow(unused)]
@@ -831,7 +828,7 @@ fn fixed(maybe: bool) -> Box<dyn Iterator<Item = char>> {
 }
 ```
 
-<hr>Compiles successfully:
+<hr>Compiles successfully (pic 49):
 
 ```rust
 #![allow(unused)]
