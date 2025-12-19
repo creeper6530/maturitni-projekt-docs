@@ -697,7 +697,7 @@ fn main() {
 }
 ```
 
-<hr>Compiles successfully (pic 47):
+<hr>Compiles successfully (pic 47; not entirely the same):
 
 ```rust
 #![allow(unused)]
@@ -763,7 +763,44 @@ Penguins win the Stanley Cup Championship!, by John Doe (Pittsburgh, PA, USA)
 (Read more from @horse_ebooks...)
 ```
 
-<hr>Does not compile (pic 48):
+<hr>Compiles successfully (pic 48):
+
+```rust
+#![allow(unused)]
+#![allow(nonstandard_style)]
+
+#[derive(Debug)]
+enum Freq {
+    Hz(u32),
+    kHz(u32),
+    MHz(u32),
+    GHz(u32)
+}
+
+impl std::fmt::Display for Freq {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Freq::Hz(val) => write!(f, "{} hertz", val),
+            Freq::kHz(val) => write!(f, "{} kilohertz", val),
+            Freq::MHz(val) => write!(f, "{} megahertz", val),
+            Freq::GHz(val) => write!(f, "{} gigahertz", val),
+        }
+    }
+}
+
+fn main() {
+    let freq = Freq::kHz(201);
+    println!("{}", freq);
+    println!("{:?}", freq);
+}
+```
+
+```
+201 kilohertz
+kHz(201)
+```
+
+<hr>Does not compile (pic 49):
 
 ```rust
 #![allow(unused)]
@@ -828,42 +865,152 @@ fn fixed(maybe: bool) -> Box<dyn Iterator<Item = char>> {
 }
 ```
 
-<hr>Compiles successfully (pic 49):
+# Closures
+
+Compiles (pic 50):
 
 ```rust
-#![allow(unused)]
-#![allow(nonstandard_style)]
+#[allow(unused)]
 
-#[derive(Debug)]
-enum Freq {
-    Hz(u32),
-    kHz(u32),
-    MHz(u32),
-    GHz(u32)
+fn main() {
+    fn  add_one_v1   (x: u32) -> u32 { x + 1 }
+    let add_one_v2 = |x: u32| -> u32 { x + 1 };
+    let add_one_v3 = |x|             { x + 1 };
+    let add_one_v4 = |x|               x + 1  ;
+
+    // Works fine without
+    /*add_one_v1(5_u32);
+    add_one_v2(5_u32);*/
+
+    // Needed for the closures to infer their types
+    add_one_v3(5_u32);
+    add_one_v4(5_u32);
 }
+```
 
-impl std::fmt::Display for Freq {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Freq::Hz(val) => write!(f, "{} hertz", val),
-            Freq::kHz(val) => write!(f, "{} kilohertz", val),
-            Freq::MHz(val) => write!(f, "{} megahertz", val),
-            Freq::GHz(val) => write!(f, "{} gigahertz", val),
-        }
-    }
+<hr> Fails to compile (pic 51, error on pic 52):
+
+```rust
+#[allow(unused)]
+
+fn main() {
+    let example_closure = |x| x;
+
+    let s = example_closure(String::from("hello"));
+    let n = example_closure(5);
+}
+```
+
+```
+error[E0308]: mismatched types
+ --> .\test_code.rs:7:29
+  |
+7 |     let n = example_closure(5);
+  |             --------------- ^ expected `String`, found integer
+  |             |
+  |             arguments to this function are incorrect
+  |
+note: expected because the closure was earlier called with an argument of type `String`
+ --> .\test_code.rs:6:29
+  |
+6 |     let s = example_closure(String::from("hello"));
+  |             --------------- ^^^^^^^^^^^^^^^^^^^^^ expected because this argument is of type `String`
+  |             |
+  |             in this closure call
+note: closure parameter defined here
+ --> .\test_code.rs:4:28
+  |
+4 |     let example_closure = |x| x;
+  |                            ^
+help: try using a conversion method
+  |
+7 |     let n = example_closure(5.to_string());
+  |                              ++++++++++++
+```
+
+<hr>Compiles (unused):
+
+```rust
+#[allow(unused)]
+
+fn main() {
+    let x = 42;
+    let no_params = || { x * 2 };
+
+    no_params();
+}
+```
+
+<hr>Fails to compile (pic 53, error on pic 54):
+
+```rust
+#[allow(unused)]
+
+fn main() {
+    let mut x = String::from("abc");
+    let mut no_params = || {
+        x.make_ascii_uppercase();
+    };
+
+    println!("{}", x);
+    no_params();
+}
+```
+
+```
+error[E0502]: cannot borrow `x` as immutable because it is also borrowed as mutable
+  --> .\test_code.rs:9:20
+   |
+ 5 |     let mut no_params = || {
+   |                         -- mutable borrow occurs here
+ 6 |         x.make_ascii_uppercase();
+   |         - first borrow occurs due to use of `x` in closure
+...
+ 9 |     println!("{}", x);
+   |                    ^ immutable borrow occurs here
+10 |     no_params();
+   |     --------- mutable borrow later used here
+   |
+   = note: this error originates in the macro `$crate::format_args_nl` which comes from the expansion of the macro `println` (in Nightly builds, run with -Z macro-backtrace for more info)
+```
+
+<hr>Compiles successfully (unused):
+
+```rust
+#[allow(unused)]
+
+fn main() {
+    let mut x = String::from("abc");
+    let mut up = false;
+    let mut no_params = move || {
+        if up {
+            x.make_ascii_lowercase();
+            up = false;
+        } else {
+            x.make_ascii_uppercase();
+            up = true;
+        };
+        println!("{}", x);
+    };
+
+    // Would throw "use after move" error
+    //println!("{}", x);
+    no_params();
+    no_params();
+}
+```
+
+<hr>Compiles successfully (unused):
+
+```rust
+#[allow(unused)]
+
+fn test(mut fun: impl FnMut()) {
+    fun();
 }
 
 fn main() {
-    let freq = Freq::kHz(201);
-    println!("{}", freq);
-    println!("{:?}", freq);
+    let mut x = String::from("abc");
+    test(|| x.make_ascii_uppercase() );
 }
 ```
-
-```
-201 kilohertz
-kHz(201)
-```
-
-# Iterators
-
