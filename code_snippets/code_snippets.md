@@ -870,7 +870,7 @@ fn fixed(maybe: bool) -> Box<dyn Iterator<Item = char>> {
 Compiles (pic 50):
 
 ```rust
-#[allow(unused)]
+#![allow(unused)]
 
 fn main() {
     fn  add_one_v1   (x: u32) -> u32 { x + 1 }
@@ -891,7 +891,7 @@ fn main() {
 <hr> Fails to compile (pic 51, error on pic 52):
 
 ```rust
-#[allow(unused)]
+#![allow(unused)]
 
 fn main() {
     let example_closure = |x| x;
@@ -931,7 +931,7 @@ help: try using a conversion method
 <hr>Compiles (unused):
 
 ```rust
-#[allow(unused)]
+#![allow(unused)]
 
 fn main() {
     let x = 42;
@@ -944,7 +944,7 @@ fn main() {
 <hr>Fails to compile (pic 53, error on pic 54):
 
 ```rust
-#[allow(unused)]
+#![allow(unused)]
 
 fn main() {
     let mut x = String::from("abc");
@@ -974,10 +974,10 @@ error[E0502]: cannot borrow `x` as immutable because it is also borrowed as muta
    = note: this error originates in the macro `$crate::format_args_nl` which comes from the expansion of the macro `println` (in Nightly builds, run with -Z macro-backtrace for more info)
 ```
 
-<hr>Compiles successfully (unused):
+<hr>Compiles successfully (pic 55):
 
 ```rust
-#[allow(unused)]
+#![allow(unused)]
 
 fn main() {
     let mut x = String::from("abc");
@@ -990,27 +990,40 @@ fn main() {
             x.make_ascii_uppercase();
             up = true;
         };
-        println!("{}", x);
+        print!("{} ", x);
     };
 
-    // Would throw "use after move" error
+    no_params();
+    no_params();
+    no_params();
+    // Would throw "borrow of moved value" error,
+    // like seen in picture 18
     //println!("{}", x);
-    no_params();
-    no_params();
 }
 ```
 
-<hr>Compiles successfully (unused):
+```
+ABC abc ABC 
+```
+
+<hr>Compiles successfully (pic 56):
 
 ```rust
-#[allow(unused)]
+#![allow(unused)]
 
-fn test(mut fun: impl FnMut()) {
-    fun();
+fn test(f: impl Fn(u8) -> i32) {
+    f(20);
+}
+
+fn test2(f: fn (u8) -> i32) {
+    f(55);
 }
 
 fn main() {
-    let mut x = String::from("abc");
-    test(|| x.make_ascii_uppercase() );
+    let clos = |_| { println!("Hello!"); 0 };
+
+    test(clos);
+    test2(clos);
 }
 ```
+
