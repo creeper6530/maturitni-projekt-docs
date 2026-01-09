@@ -1027,3 +1027,74 @@ fn main() {
 }
 ```
 
+
+
+
+
+<hr><hr><hr>
+
+# Output 3
+
+Compiles successfully:
+
+```rust
+fn function() {
+    println!("called `function()`");
+}
+
+mod sister {
+    pub fn function() {
+        println!("called `sister::function()`");
+    }
+}
+
+mod ctx {
+    mod daughter {
+        pub fn function() {
+            println!("called `ctx::daughter::function()`");
+
+            // Accessing topmost scope
+            crate::sister::function();
+            
+            // Accessing "grandparent" scope - two levels up
+            super::super::function();
+        }
+    }
+    
+    fn function() {
+        println!("called `ctx::function()`");
+    }
+
+    pub fn test_all() {
+        // Equivalent
+        function();
+        self::function();
+
+        daughter::function();
+
+        // Accessing parent scope
+        super::function();
+    }
+}
+
+use ctx::test_all;
+use ctx::daughter::function as daughter_function;
+
+fn main() {
+    test_all();
+
+    daughter_function();
+}
+```
+
+```
+called `ctx::function()`
+called `ctx::function()`
+called `ctx::daughter::function()`
+called `sister::function()`
+called `function()`
+called `function()`
+called `ctx::daughter::function()`
+called `sister::function()`
+called `function()`
+```
