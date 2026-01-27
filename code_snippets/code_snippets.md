@@ -1098,3 +1098,52 @@ called `ctx::daughter::function()`
 called `sister::function()`
 called `function()`
 ```
+
+# Patterns
+
+Compiles successfully:
+
+```rust
+fn main() {
+    let x = Some(0);
+
+    match x {
+        Some(value) => println!("The value is: {}", value),
+        None => println!("No value found."),
+    }
+
+    if let Some(value) = x {
+        println!("The value is: {}", value);
+    } else {
+        println!("No value found.");
+    }
+    //println!("The value is: {}", value);
+
+    // -------------------------------------------------------
+
+    let y = Some(10);
+
+    let num;
+    match y {
+        Some(value) => { num = value },
+        None => {
+            println!("Error occurred.");
+            return;
+        }
+    }
+    println!("The value is: {}", num);
+
+    let Some(num) = y else {
+        println!("Error occurred.");
+        return;
+    };
+    println!("The value is: {}", num);
+}
+```
+
+```
+The value is: 0
+The value is: 0
+The value is: 10
+The value is: 10
+```
