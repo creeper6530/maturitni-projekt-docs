@@ -570,7 +570,7 @@ fn main() {
 }
 ```
 
-<hr>Compiles successfully (pic 41):
+<hr>Compiles successfully (pic 42):
 
 ```rust
 #![allow(unused)]
@@ -591,7 +591,7 @@ fn maybe_say(input: Option<&str>) {
 
 # Generics and traits
 
-Fails to compile (pic 42, error msg: pic 43):
+Fails to compile (pic 43, error msg: pic 44):
 
 ```rust
 fn largest<T>(list: &[T]) -> &T {
@@ -633,7 +633,7 @@ error: aborting due to 1 previous error
 For more information about this error, try `rustc --explain E0369`.
 ```
 
-<hr>Compiles successfully (pic 45):
+<hr>Compiles successfully (pic 46):
 
 ```rust
 #![allow(unused)]
@@ -658,7 +658,7 @@ impl<T: PartialOrd> Pair<T> {
 }
 ```
 
-<hr>Compiles successfully (pic 46):
+<hr>Compiles successfully (pic 47):
 
 ```rust
 fn largest<T: std::cmp::PartialOrd>(list: &[T]) -> Option<&T> {
@@ -697,7 +697,7 @@ fn main() {
 }
 ```
 
-<hr>Compiles successfully (pic 47; not entirely the same):
+<hr>Compiles successfully (pic 48; not entirely the same):
 
 ```rust
 #![allow(unused)]
@@ -763,7 +763,7 @@ Penguins win the Stanley Cup Championship!, by John Doe (Pittsburgh, PA, USA)
 (Read more from @horse_ebooks...)
 ```
 
-<hr>Compiles successfully (pic 48):
+<hr>Compiles successfully (pic 49):
 
 ```rust
 #![allow(unused)]
@@ -800,7 +800,7 @@ fn main() {
 kHz(201)
 ```
 
-<hr>Does not compile (pic 49):
+<hr>Does not compile (pic 50):
 
 ```rust
 #![allow(unused)]
@@ -867,7 +867,7 @@ fn fixed(maybe: bool) -> Box<dyn Iterator<Item = char>> {
 
 # Closures
 
-Compiles (pic 50):
+Compiles (pic 51):
 
 ```rust
 #![allow(unused)]
@@ -888,7 +888,7 @@ fn main() {
 }
 ```
 
-<hr> Fails to compile (pic 51, error on pic 52):
+<hr> Fails to compile (pic 52, error on pic 53):
 
 ```rust
 #![allow(unused)]
@@ -941,7 +941,7 @@ fn main() {
 }
 ```
 
-<hr>Fails to compile (pic 53, error on pic 54):
+<hr>Fails to compile (pic 54, error on pic 55):
 
 ```rust
 #![allow(unused)]
@@ -974,7 +974,7 @@ error[E0502]: cannot borrow `x` as immutable because it is also borrowed as muta
    = note: this error originates in the macro `$crate::format_args_nl` which comes from the expansion of the macro `println` (in Nightly builds, run with -Z macro-backtrace for more info)
 ```
 
-<hr>Compiles successfully (pic 55):
+<hr>Compiles successfully (pic 56):
 
 ```rust
 #![allow(unused)]
@@ -1006,7 +1006,7 @@ fn main() {
 ABC abc ABC 
 ```
 
-<hr>Compiles successfully (pic 56):
+<hr>Compiles successfully (pic 57):
 
 ```rust
 #![allow(unused)]
@@ -1027,13 +1027,91 @@ fn main() {
 }
 ```
 
+# Patterns
+
+Compiles successfully (pic 41):
+
+```rust
+fn main() {
+    let x = Some(0);
+
+    match x {
+        Some(value) => println!("The value is: {}", value),
+        None => println!("No value found."),
+    }
+
+    if let Some(value) = x {
+        println!("The value is: {}", value);
+    } else {
+        println!("No value found.");
+    }
+    //println!("The value is: {}", value);
+
+    // -------------------------------------------------------
+
+    let y = Some(10);
+
+    let num;
+    match y {
+        Some(value) => { num = value },
+        None => {
+            println!("Error occurred.");
+            return;
+        }
+    }
+    println!("The value is: {}", num);
+
+    let Some(num) = y else {
+        println!("Error occurred.");
+        return;
+    };
+    println!("The value is: {}", num);
+}
+```
+
+```
+The value is: 0
+The value is: 0
+The value is: 10
+The value is: 10
+```
+
+<hr> Compiles successfully (unused):
+
+```rust
+fn main() {
+    let x: u32 = 6;
+    let y = Some(42);
+    let z = "hello world";
+
+    match x {
+        0 => println!("x is zero"),
+        1 | 6 | 8 | 9 => println!("x is a nice number"),
+        2 | 3 | 4 | 5 | 7 => println!("x is an ugly number"),
+        10..=99 => println!("x is double digit number"),
+        100.. => println!("x is triple digit or more"),
+    }
+    match y {
+        Some(num) if (num % 2 == 0) => println!("The number {num} is even"),
+        Some(num) => println!("The number {num} is odd"),
+        None => println!("No number provided"),
+    }
+    match z {
+        string if string.starts_with("hello") => println!("Greeting detected: {string}"),
+        string => println!("Normal string: {string}"),
+    }
+}
+```
+
+```
+x is a nice number
+The number 42 is even
+Greeting detected: hello world
+```
 
 
-
-
-<hr><hr><hr>
-
-# Output 3
+<details>
+<summary><h1> Output 3 </h1></summary>
 
 Compiles successfully:
 
@@ -1098,52 +1176,4 @@ called `ctx::daughter::function()`
 called `sister::function()`
 called `function()`
 ```
-
-# Patterns
-
-Compiles successfully:
-
-```rust
-fn main() {
-    let x = Some(0);
-
-    match x {
-        Some(value) => println!("The value is: {}", value),
-        None => println!("No value found."),
-    }
-
-    if let Some(value) = x {
-        println!("The value is: {}", value);
-    } else {
-        println!("No value found.");
-    }
-    //println!("The value is: {}", value);
-
-    // -------------------------------------------------------
-
-    let y = Some(10);
-
-    let num;
-    match y {
-        Some(value) => { num = value },
-        None => {
-            println!("Error occurred.");
-            return;
-        }
-    }
-    println!("The value is: {}", num);
-
-    let Some(num) = y else {
-        println!("Error occurred.");
-        return;
-    };
-    println!("The value is: {}", num);
-}
-```
-
-```
-The value is: 0
-The value is: 0
-The value is: 10
-The value is: 10
-```
+</details>
