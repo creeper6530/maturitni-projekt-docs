@@ -20,9 +20,17 @@ error[E0425]: cannot find value `y` in this scope
  --> .\test_code.rs:9:19
   |
 9 |     println!("y: {y}");   //          |
-  |                   ^ help: a local variable with a similar name exists: `x`
+  |                   ^
+  |
+help: the binding `y` is available in a different scope in the same function
+ --> .\test_code.rs:5:13
+  |
+5 |         let y = 5;        //  |       |
+  |             ^
 
 error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0425`.
 ```
 
 <hr>Compiles successfully (pic 5).
@@ -383,7 +391,7 @@ For more information about this error, try `rustc --explain E0597`.
 <hr>Fails to compile (pic 22, error msg: pic 23):
 
 ```rust
-struct Structure{
+struct Structure {
     ptr: &u32
 }
 
@@ -544,7 +552,7 @@ fn main() {
 }
 ```
 
-<hr>Compiles successfully (pic 37):
+<hr>Compiles successfully (pic 39):
 
 ```rust
 #![allow(unused)]
@@ -697,14 +705,13 @@ fn main() {
 }
 ```
 
-<hr>Compiles successfully (pic 48; not entirely the same):
+<hr>Compiles successfully (pic 49; not entirely the same):
 
 ```rust
 #![allow(unused)]
 
 trait Summary {
     fn summarize_author(&self) -> String;
-
     fn summarize(&self) -> String {
         format!("(Read more from {}...)", self.summarize_author())
     }
@@ -712,14 +719,13 @@ trait Summary {
 
 struct NewsArticle {
     headline: String,
-    location: String,
     author: String,
     content: String,
 }
 
 impl Summary for NewsArticle {
     fn summarize(&self) -> String {
-        format!("{}, by {} ({})", self.headline, self.author, self.location)
+        format!("{}, by {}", self.headline, self.author, self.location)
     }
 
     fn summarize_author(&self) -> String {
@@ -730,7 +736,6 @@ impl Summary for NewsArticle {
 struct SocialPost {
     username: String,
     content: String,
-    reply: bool,
     repost: bool,
 }
 
@@ -742,16 +747,14 @@ impl Summary for SocialPost {
 
 fn main() {
     let article = NewsArticle {
-        headline: String::from("Penguins win the Stanley Cup Championship!"),
-        location: String::from("Pittsburgh, PA, USA"),
+        headline: String::from("Penguins win the Stanley Cup!"),
         author: String::from("John Doe"),
-        content: String::from("The Pittsburgh Penguins once again are the best hockey team."),
+        content: String::from("The Pittsburgh Penguins once win."),
     };
     println!("{}", article.summarize());
     let post = SocialPost {
         username: String::from("horse_ebooks"),
-        content: String::from("The best way to learn Rust is to write Rust."),
-        reply: false,
+        content: String::from("The best way to learn is to do."),
         repost: false,
     };
     println!("{}", post.summarize());
@@ -759,11 +762,11 @@ fn main() {
 ```
 
 ```
-Penguins win the Stanley Cup Championship!, by John Doe (Pittsburgh, PA, USA)
+Penguins win the Stanley Cup!, by John Doe
 (Read more from @horse_ebooks...)
 ```
 
-<hr>Compiles successfully (pic 49):
+<hr>Compiles successfully (pic 50):
 
 ```rust
 #![allow(unused)]
@@ -800,7 +803,7 @@ fn main() {
 kHz(201)
 ```
 
-<hr>Does not compile (pic 50):
+<hr>Does not compile (pic 51):
 
 ```rust
 #![allow(unused)]
@@ -867,7 +870,7 @@ fn fixed(maybe: bool) -> Box<dyn Iterator<Item = char>> {
 
 # Closures
 
-Compiles (pic 51):
+Compiles (pic 52):
 
 ```rust
 #![allow(unused)]
@@ -888,7 +891,7 @@ fn main() {
 }
 ```
 
-<hr> Fails to compile (pic 52, error on pic 53):
+<hr> Fails to compile (pic 53, error on pic 54):
 
 ```rust
 #![allow(unused)]
@@ -941,7 +944,7 @@ fn main() {
 }
 ```
 
-<hr>Fails to compile (pic 54, error on pic 55):
+<hr>Fails to compile (pic 55, error on pic 56):
 
 ```rust
 #![allow(unused)]
@@ -974,7 +977,7 @@ error[E0502]: cannot borrow `x` as immutable because it is also borrowed as muta
    = note: this error originates in the macro `$crate::format_args_nl` which comes from the expansion of the macro `println` (in Nightly builds, run with -Z macro-backtrace for more info)
 ```
 
-<hr>Compiles successfully (pic 56):
+<hr>Compiles successfully (pic 57):
 
 ```rust
 #![allow(unused)]
@@ -1006,7 +1009,7 @@ fn main() {
 ABC abc ABC 
 ```
 
-<hr>Compiles successfully (pic 57):
+<hr>Compiles successfully (pic 58):
 
 ```rust
 #![allow(unused)]
