@@ -1180,3 +1180,30 @@ called `sister::function()`
 called `function()`
 ```
 </details>
+
+Builds successfully (presentation):
+
+```rust
+fn main() {
+    larger(&5, &3);
+    /*larger(&2.0, &3.0);*/
+
+    larger_generic(&5, &3);
+    larger_generic(&2.0, &3.0);
+}
+
+fn larger(a: &i32, b: &i32) -> bool {
+    a > b
+}
+
+/*fn larger_generic<T>(a: &T, b: &T) -> bool
+{
+    a > b
+}*/
+
+fn larger_generic<T>(a: &T, b: &T) -> bool
+where T: std::cmp::PartialOrd
+{
+    a > b
+}
+```
