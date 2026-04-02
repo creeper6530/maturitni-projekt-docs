@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500">
+<style>
+.box-top { fill:#d0e6ff; stroke:#000; stroke-width:2; }
+.box-mid { fill:#d5f5e3; stroke:#000; stroke-width:2; }
+.box-bot { fill:#fde2e2; stroke:#000; stroke-width:2; }
+.text { font-family:Arial, sans-serif; font-size:16px; dominant-baseline:middle; text-anchor:middle; }
+.arrow { stroke:#000; stroke-width:2; fill:none; marker-end:url(#arrowhead); }
+</style>
+<defs>
+<marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+<polygon points="0 0, 10 3.5, 0 7" fill="#000"/>
+</marker>
+</defs>
+
+<!-- Boxes -->
+<rect x="100" y="50" width="150" height="50" class="box-top"/>
+<text x="175" y="75" class="text">ssd1306</text>
+
+<rect x="325" y="50" width="150" height="50" class="box-top"/>
+<text x="400" y="75" class="text">hd44780-driver</text>
+
+<rect x="550" y="50" width="150" height="50" class="box-top"/>
+<text x="625" y="75" class="text">dht20-rs</text>
+
+<rect x="325" y="170" width="150" height="50" class="box-mid"/>
+<text x="400" y="195" class="text">embedded-hal</text>
+
+<rect x="100" y="300" width="150" height="50" class="box-bot"/>
+<text x="175" y="325" class="text">rp2040-hal</text>
+
+<rect x="325" y="300" width="150" height="50" class="box-bot"/>
+<text x="400" y="325" class="text">stm32f3xx-hal</text>
+
+<rect x="550" y="300" width="150" height="50" class="box-bot"/>
+<text x="625" y="325" class="text">nrf52840-hal</text>
+
+<!-- Z-shaped arrows (top -> middle) -->
+<path d="M175 100 V135 Q175 150 190 150 H385 Q400 150 400 165 V170" class="arrow"/>
+<path d="M400 100 V170" class="arrow"/>
+<path d="M625 100 V135 Q625 150 610 150 H415 Q400 150 400 165 V170" class="arrow"/>
+
+<!-- Z-shaped arrows (middle -> bottom) -->
+<path d="M400 220 V255 Q400 270 385 270 H190 Q175 270 175 285 V300" class="arrow"/>
+<path d="M400 220 V300" class="arrow"/>
+<path d="M400 220 V255 Q400 270 415 270 H610 Q625 270 625 285 V300" class="arrow"/>
+
+</svg>
