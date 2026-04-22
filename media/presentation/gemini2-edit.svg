@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <!-- Background to ensure visibility on all themes -->
+  <rect width="100%" height="100%" fill="#FFFFFF" />
+
+  <!-- Define Arrowhead Marker -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#455A64" />
+    </marker>
+  </defs>
+
+  <!-- ==================== LINES & CONNECTIONS ==================== -->
+  <g id="connections" fill="none" stroke="#455A64" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    
+    <!-- Top to Middle (Level 1 pointing down to Level 2) -->
+    <!-- Center trunk (hd44780-driver to embedded-hal) -->
+    <line x1="400" y1="140" x2="400" y2="260" marker-end="url(#arrow)" />
+    <!-- Left branch joining the center trunk with a curve -->
+    <path d="M 160 140 L 160 185 Q 160 200 175 200 L 385 200 Q 400 200 400 215" />
+    <!-- Right branch joining the center trunk with a curve -->
+    <path d="M 640 140 L 640 185 Q 640 200 625 200 L 415 200 Q 400 200 400 215" />
+
+    <!-- Middle to Bottom (Level 2 pointing down to Level 3) -->
+    <!-- Center trunk (embedded-hal to stm32f3xx-hal) -->
+    <line x1="400" y1="340" x2="400" y2="460" marker-end="url(#arrow)" />
+    <!-- Left branch branching out from the center trunk with a curve -->
+    <path d="M 400 385 Q 400 400 385 400 L 175 400 Q 160 400 160 415 L 160 460" marker-end="url(#arrow)" />
+    <!-- Right branch branching out from the center trunk with a curve -->
+    <path d="M 400 385 Q 400 400 415 400 L 625 400 Q 640 400 640 415 L 640 460" marker-end="url(#arrow)" />
+
+  </g>
+
+  <!-- ==================== NODES / BOXES ==================== -->
+  
+  <!-- Level 1 (Hardware Drivers - Blue) -->
+  <g id="level-1">
+    <!-- ssd1306 -->
+    <rect x="70" y="60" width="180" height="80" rx="8" fill="#E1F5FE" stroke="#01579B" stroke-width="3" />
+    <text x="160" y="100" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" fill="#01579B" text-anchor="middle" dominant-baseline="middle">ssd1306</text>
+
+    <!-- hd44780-driver -->
+    <rect x="310" y="60" width="180" height="80" rx="8" fill="#E1F5FE" stroke="#01579B" stroke-width="3" />
+    <text x="400" y="100" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" fill="#01579B" text-anchor="middle" dominant-baseline="middle">hx711_spi</text>
+
+    <!-- dht20-rs -->
+    <rect x="550" y="60" width="180" height="80" rx="8" fill="#E1F5FE" stroke="#01579B" stroke-width="3" />
+    <text x="640" y="100" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" fill="#01579B" text-anchor="middle" dominant-baseline="middle">dht20-rs</text>
+  </g>
+
+  <!-- Level 2 (HAL Abstraction - Green) -->
+  <g id="level-2">
+    <!-- embedded-hal -->
+    <rect x="310" y="260" width="180" height="80" rx="8" fill="#E8F5E9" stroke="#1B5E20" stroke-width="3" />
+    <text x="400" y="300" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" fill="#1B5E20" text-anchor="middle" dominant-baseline="middle">embedded-hal</text>
+  </g>
+
+  <!-- Level 3 (MCU Specific HALs - Purple) -->
+  <g id="level-3">
+    <!-- rp2040-hal -->
+    <rect x="70" y="460" width="180" height="80" rx="8" fill="#F3E5F5" stroke="#4A148C" stroke-width="3" />
+    <text x="160" y="500" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" fill="#4A148C" text-anchor="middle" dominant-baseline="middle">rp2040-hal</text>
+
+    <!-- stm32f3xx-hal -->
+    <rect x="310" y="460" width="180" height="80" rx="8" fill="#F3E5F5" stroke="#4A148C" stroke-width="3" />
+    <text x="400" y="500" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" fill="#4A148C" text-anchor="middle" dominant-baseline="middle">stm32f3xx-hal</text>
+
+    <!-- nrf52840-hal -->
+    <rect x="550" y="460" width="180" height="80" rx="8" fill="#F3E5F5" stroke="#4A148C" stroke-width="3" />
+    <text x="640" y="500" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" fill="#4A148C" text-anchor="middle" dominant-baseline="middle">nrf52840-hal</text>
+  </g>
+</svg>
